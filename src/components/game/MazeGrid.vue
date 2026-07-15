@@ -1,4 +1,9 @@
 <template>
+  <div class="game-info">
+    <h2>🧩 AI Maze Escape</h2>
+    <p>⏱️ Time: {{ seconds }}s</p>
+  </div>
+
   <div class="maze">
     <div
       v-for="(row, rowIndex) in maze"
@@ -34,9 +39,12 @@
   <div v-if="gameWon" class="modal-overlay">
     <div class="modal">
       <h2>🎉 Congratulations!</h2>
-      <p>You escaped the maze.</p>
 
-      <button @click="location.reload()">
+      <p>You escaped the maze!</p>
+
+      <p>⏱️ Time: {{ seconds }} seconds</p>
+
+      <button @click="playAgain">
         Play Again
       </button>
     </div>
@@ -61,6 +69,24 @@ const player = ref({
 
 const gameWon = ref(false)
 
+// Timer
+const seconds = ref(0)
+let timer = null
+
+function startTimer() {
+  timer = setInterval(() => {
+    seconds.value++
+  }, 1000)
+}
+
+function stopTimer() {
+  clearInterval(timer)
+}
+
+function playAgain() {
+  window.location.reload()
+}
+
 function movePlayer(rowOffset, colOffset) {
   const newRow = player.value.row + rowOffset
   const newCol = player.value.col + colOffset
@@ -76,6 +102,7 @@ function movePlayer(rowOffset, colOffset) {
     player.value.row === exit.row &&
     player.value.col === exit.col
   ) {
+    stopTimer()
     gameWon.value = true
   }
 }
@@ -104,14 +131,25 @@ function handleKeyDown(event) {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
+  startTimer()
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
+  stopTimer()
 })
 </script>
 
 <style scoped>
+.game-info {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.game-info h2 {
+  margin-bottom: 8px;
+}
+
 .maze {
   display: inline-block;
 }
