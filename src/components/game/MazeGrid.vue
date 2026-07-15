@@ -15,18 +15,30 @@
           player: player.row === rowIndex && player.col === colIndex
         }"
       >
-       <span
-  v-if="player.row === rowIndex && player.col === colIndex"
->
-  😀
-</span>
+        <span
+          v-if="player.row === rowIndex && player.col === colIndex"
+        >
+          😀
+        </span>
 
-<span
-  v-else-if="exit.row === rowIndex && exit.col === colIndex"
->
-  🚪
-</span>
+        <span
+          v-else-if="exit.row === rowIndex && exit.col === colIndex"
+        >
+          🚪
+        </span>
       </div>
+    </div>
+  </div>
+
+  <!-- Victory Modal -->
+  <div v-if="gameWon" class="modal-overlay">
+    <div class="modal">
+      <h2>🎉 Congratulations!</h2>
+      <p>You escaped the maze.</p>
+
+      <button @click="location.reload()">
+        Play Again
+      </button>
     </div>
   </div>
 </template>
@@ -47,51 +59,56 @@ const player = ref({
   col: 1
 })
 
+const gameWon = ref(false)
+
 function movePlayer(rowOffset, colOffset) {
-  const newRow = player.value.row + rowOffset;
-  const newCol = player.value.col + colOffset;
+  const newRow = player.value.row + rowOffset
+  const newCol = player.value.col + colOffset
 
   if (maze[newRow][newCol] === 1) {
-    return;
+    return
   }
 
-  player.value.row = newRow;
-  player.value.col = newCol;
+  player.value.row = newRow
+  player.value.col = newCol
+
   if (
-  player.value.row === exit.row &&
-  player.value.col === exit.col
-) {
-  alert("🎉 You escaped the maze!");
-}
+    player.value.row === exit.row &&
+    player.value.col === exit.col
+  ) {
+    gameWon.value = true
+  }
 }
 
 function handleKeyDown(event) {
+  if (gameWon.value) return
+
   switch (event.key) {
     case 'ArrowUp':
-      movePlayer(-1, 0);
-      break;
+      movePlayer(-1, 0)
+      break
 
     case 'ArrowDown':
-      movePlayer(1, 0);
-      break;
+      movePlayer(1, 0)
+      break
 
     case 'ArrowLeft':
-      movePlayer(0, -1);
-      break;
+      movePlayer(0, -1)
+      break
 
     case 'ArrowRight':
-      movePlayer(0, 1);
-      break;
+      movePlayer(0, 1)
+      break
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown);
-});
+  window.addEventListener('keydown', handleKeyDown)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown);
-});
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <style scoped>
@@ -122,5 +139,48 @@ onUnmounted(() => {
 
 .player {
   font-size: 18px;
+}
+
+/* Victory Modal */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  min-width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal h2 {
+  margin-bottom: 10px;
+}
+
+.modal p {
+  margin-bottom: 20px;
+}
+
+.modal button {
+  padding: 10px 20px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal button:hover {
+  background: #1d4ed8;
 }
 </style>
