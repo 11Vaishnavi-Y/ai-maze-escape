@@ -1,52 +1,73 @@
 <template>
-  <div class="game-info">
-    <h2>🧩 AI Maze Escape</h2>
-    <p>⏱️ Time: {{ seconds }}s</p>
+  <div class="game-container">
+    <!-- Header -->
+    <div class="game-info">
+      <h2>🧩 AI Maze Escape</h2>
+
+     <div class="stats">
+  <div class="stat-item">
+    ⏱️ {{ seconds }}s
   </div>
 
-  <div class="maze">
-    <div
-      v-for="(row, rowIndex) in maze"
-      :key="rowIndex"
-      class="row"
-    >
-      <div
-        v-for="(cell, colIndex) in row"
-        :key="colIndex"
-        class="cell"
-        :class="{
-          wall: cell === 1,
-          path: cell === 0,
-          player: player.row === rowIndex && player.col === colIndex
-        }"
-      >
-        <span
-          v-if="player.row === rowIndex && player.col === colIndex"
-        >
-          😀
-        </span>
+  <div class="stat-item">
+    👣 {{ moves }}
+  </div>
+</div>
+    </div>
 
-        <span
-          v-else-if="exit.row === rowIndex && exit.col === colIndex"
+    <!-- Maze -->
+    <div class="maze">
+      <div
+        v-for="(row, rowIndex) in maze"
+        :key="rowIndex"
+        class="row"
+      >
+        <div
+          v-for="(cell, colIndex) in row"
+          :key="colIndex"
+          class="cell"
+          :class="{
+            wall: cell === 1,
+            path: cell === 0,
+            player: player.row === rowIndex && player.col === colIndex
+          }"
         >
-          🚪
-        </span>
+          <span
+            v-if="player.row === rowIndex && player.col === colIndex"
+          >
+            😀
+          </span>
+
+          <span
+            v-else-if="exit.row === rowIndex && exit.col === colIndex"
+          >
+            🚪
+          </span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Victory Modal -->
-  <div v-if="gameWon" class="modal-overlay">
-    <div class="modal">
-      <h2>🎉 Congratulations!</h2>
+     <div class="game-footer">
+      <div class="controls">
+        <strong>🎮 Controls:</strong>
+        Use the Arrow Keys (↑ ↓ ← →) to reach the 🚪 exit.
+      </div>
+    </div>
 
-      <p>You escaped the maze!</p>
+    <!-- Victory Modal -->
+    <div v-if="gameWon" class="modal-overlay">
+      <div class="modal">
+        <h2>🎉 Congratulations!</h2>
 
-      <p>⏱️ Time: {{ seconds }} seconds</p>
+        <p>You escaped the maze!</p>
 
-      <button @click="playAgain">
-        Play Again
-      </button>
+     <p>⏱️ Time: {{ seconds }} seconds</p>
+     <p>👣 Moves: {{ moves }}</p>
+
+        <button @click="playAgain">
+          Play Again
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -71,6 +92,8 @@ const gameWon = ref(false)
 
 // Timer
 const seconds = ref(0)
+const moves = ref(0)
+
 let timer = null
 
 function startTimer() {
@@ -95,8 +118,10 @@ function movePlayer(rowOffset, colOffset) {
     return
   }
 
-  player.value.row = newRow
-  player.value.col = newCol
+player.value.row = newRow
+player.value.col = newCol
+
+moves.value++
 
   if (
     player.value.row === exit.row &&
@@ -141,17 +166,57 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+* {
+  box-sizing: border-box;
+}
+
+.game-container {
+  max-width: 1000px;
+  width: 95%;
+  margin: 40px auto;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
 .game-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 18px;
   margin-bottom: 20px;
-  text-align: center;
+  border-bottom: 2px solid #f1f5f9;
 }
 
 .game-info h2 {
-  margin-bottom: 8px;
+  margin: 0;
+  font-size: 2rem;
+  color: #1e293b;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2563eb;
 }
 
 .maze {
   display: inline-block;
+  padding: 20px;
+  background: #e2e8f0;
+  border-radius: 14px;
+  overflow: auto;
+  max-width: 100%;
 }
 
 .row {
@@ -159,16 +224,15 @@ onUnmounted(() => {
 }
 
 .cell {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #ccc;
+  width: 32px;
+  height: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .wall {
-  background: #222;
+  background: #1e293b;
 }
 
 .path {
@@ -176,49 +240,119 @@ onUnmounted(() => {
 }
 
 .player {
-  font-size: 18px;
+  font-size: 20px;
 }
 
-/* Victory Modal */
+.game-footer {
+  margin-top: 24px;
+  border-top: 2px solid #f1f5f9;
+  padding-top: 18px;
+}
+
+.controls {
+  color: #64748b;
+  font-size: 15px;
+}
+
+.controls strong {
+  color: #0f172a;
+}
+
+/* Modal */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-
+  background: rgba(15, 23, 42, .7);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal {
+  width: 360px;
+  max-width: 90%;
   background: white;
+  border-radius: 18px;
   padding: 30px;
-  border-radius: 12px;
-  min-width: 320px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: popup .25s ease;
 }
 
 .modal h2 {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  color: #0f172a;
 }
 
 .modal p {
-  margin-bottom: 20px;
+  color: #64748b;
+  margin-bottom: 14px;
 }
 
 .modal button {
-  padding: 10px 20px;
-  border: none;
+  margin-top: 10px;
+  width: 100%;
+  padding: 14px;
   background: #2563eb;
   color: white;
-  border-radius: 8px;
-  cursor: pointer;
+  border: none;
+  border-radius: 10px;
   font-size: 16px;
+  cursor: pointer;
 }
 
 .modal button:hover {
   background: #1d4ed8;
+}
+
+@keyframes popup {
+  from {
+    transform: scale(.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+  .game-container {
+    padding: 16px;
+    margin: 20px auto;
+  }
+
+  .game-info {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .game-info h2 {
+    font-size: 1.6rem;
+  }
+
+  .stats {
+     flex-direction: column;
+  gap: 8px;
+  }
+
+.stat-item {
+  font-size: 16px;
+}
+
+  .cell {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .maze {
+    padding: 10px;
+  }
 }
 </style>
