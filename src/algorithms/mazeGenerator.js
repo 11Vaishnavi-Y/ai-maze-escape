@@ -29,10 +29,12 @@ function getNeighbours(maze, row, col, rows, cols) {
   return neighbours;
 }
 
-function getRandomNeighbour(neighbours) {
-  const randomIndex = Math.floor(Math.random() * neighbours.length);
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
 
-  return neighbours[randomIndex];
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
 function removeWall(maze, current, next) {
@@ -45,31 +47,40 @@ function removeWall(maze, current, next) {
 }
 
 function carvePath(maze, row, col, rows, cols) {
+  // Mark current cell as a path
   maze[row][col] = 0;
 
-const neighbours =
-    getNeighbours(maze, row, col, rows, cols);
+  while (true) {
+    // Get current unvisited neighbours
+    const neighbours = getNeighbours(maze, row, col, rows, cols);
 
+    // No neighbours? Backtrack
     if (neighbours.length === 0) {
-        return;
+      return;
     }
 
+    // Randomize the order
+    shuffle(neighbours);
 
-  const next = getRandomNeighbour(neighbours);
+    // Pick the first neighbour after shuffling
+    const next = neighbours[0];
 
-  removeWall(
-    maze,
-    { row, col },
-    next
-  );
+    // Remove the wall
+    removeWall(
+      maze,
+      { row, col },
+      next
+    );
+
+    // Continue from that neighbour
     carvePath(
-    maze,
-    next.row,
-    next.col,
-    rows,
-    cols
-  );
-
+      maze,
+      next.row,
+      next.col,
+      rows,
+      cols
+    );
+  }
 }
 
 export function generateMaze(rows = 15, cols = 15) {
