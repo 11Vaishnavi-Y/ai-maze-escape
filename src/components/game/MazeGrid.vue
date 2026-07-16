@@ -62,14 +62,14 @@
           :key="colIndex"
           class="cell"
          :class="{
-           wall: cell === 1,
-           path: cell === 0,
-           player: player.row === rowIndex && player.col === colIndex,
-           hint:
-             hint &&
-             hint.row === rowIndex &&
-             hint.col === colIndex
-          }"
+  wall: cell === 1,
+  path: cell === 0,
+  player: player.row === rowIndex && player.col === colIndex,
+  hint:
+    (hint &&
+    hint.row === rowIndex &&
+    hint.col === colIndex)
+}"
         >
           <span
             v-if="player.row === rowIndex && player.col === colIndex"
@@ -114,6 +114,19 @@
      <p>⏱️ Time: {{ seconds }} seconds</p>
      <p>👣 Moves: {{ moves }}</p>
 
+     <div class="achievement-section">
+  <h3>🏅 Achievements</h3>
+
+  <ul>
+    <li
+      v-for="(achievement, index) in achievements"
+      :key="index"
+    >
+      {{ achievement }}
+    </li>
+  </ul>
+</div>
+
         <button @click="playAgain">
           Play Again
         </button>
@@ -123,12 +136,15 @@
 </template>
 
 <script setup>
+import { findPath } from '../../algorithms/pathFinder'
 import { saveScore } from '../../utils/leaderboard'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { generateMaze } from '../../algorithms/mazeGenerator'
-import { findShortestPath } from '../../algorithms/bfs'
 
 const maze = ref(generateMaze())
+console.log(maze.value)
+
+const achievements = ref([])
 
 const exit = ref({
   row: maze.value.length - 2,
@@ -177,14 +193,21 @@ function toggleTheme() {
 }
 
 function showHint() {
-  const path = findShortestPath(
+  const path = findPath(
     maze.value,
     player.value,
     exit.value
   )
 
+  console.log("Path:", path)
+
   if (path.length > 1) {
     hint.value = path[1]
+    console.log("Hint:", hint.value)
+
+    setTimeout(() => {
+      hint.value = null
+    }, 1000)
   }
 }
 
@@ -236,13 +259,22 @@ player.value.col === exit.value.col
   ) {
     stopTimer()
 
-     saveScore({
-    difficulty: difficulty.value,
-    time: seconds.value,
-    moves: moves.value,
-    date: new Date().toLocaleDateString()
-  })
-    gameWon.value = true
+   stopTimer()
+
+achievements.value = getAchievements(
+  seconds.value,
+  moves.value,
+  difficulty.value
+)
+
+saveScore({
+  difficulty: difficulty.value,
+  time: seconds.value,
+  moves: moves.value,
+  date: new Date().toLocaleDateString()
+})
+
+gameWon.value = true
   }
 }
 
@@ -289,6 +321,38 @@ onUnmounted(() => {
 <style scoped>
 * {
   box-sizing: border-box;
+}
+
+.achievement-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.achievement-section h3 {
+  margin-bottom: 10px;
+  color: #2563eb;
+}
+
+.achievement-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.achievement-section li {
+  padding: 6px 0;
+  font-size: 15px;
+}
+
+.dark .achievement-section {
+  background: #1f2937;
+}
+
+.dark .achievement-section h3 {
+  color: #60a5fa;
 }
 
 .mobile-controls {
@@ -425,8 +489,13 @@ onUnmounted(() => {
   border-color: #2563eb;
 }
 
+.path {
+  background: white;
+}
+
 .hint {
-  background: #fde047 !important;
+  background: yellow !important;
+  border: 3px solid red !important;
 }
 
 .game-container {
@@ -510,10 +579,6 @@ onUnmounted(() => {
 
 .wall {
   background: #1e293b;
-}
-
-.path {
-  background: white;
 }
 
 .player {
