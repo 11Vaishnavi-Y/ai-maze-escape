@@ -136,6 +136,7 @@
 </template>
 
 <script setup>
+import { getAchievements } from '../../utils/achievements'
 import { findPath } from '../../algorithms/pathFinder'
 import { saveScore } from '../../utils/leaderboard'
 import { ref, onMounted, onUnmounted } from 'vue'
