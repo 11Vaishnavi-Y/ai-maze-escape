@@ -1,5 +1,8 @@
 <template>
-  <div class="game-container">
+ <div
+  class="game-container"
+  :class="{ dark: isDarkMode }"
+>
     <!-- Header -->
   <div class="game-info">
   <h2>🧩 AI Maze Escape</h2>
@@ -36,6 +39,13 @@
   <option>Medium</option>
   <option>Hard</option>
 </select>
+
+<button
+  class="theme-btn"
+  @click="toggleTheme"
+>
+  {{ isDarkMode ? '☀️ Light' : '🌙 Dark' }}
+</button>
 
   </div>
 </div>
@@ -76,6 +86,17 @@
       </div>
     </div>
 
+    <div class="mobile-controls">
+  <button @click="movePlayer(-1, 0)">⬆️</button>
+
+  <div class="horizontal-controls">
+    <button @click="movePlayer(0, -1)">⬅️</button>
+    <button @click="movePlayer(0, 1)">➡️</button>
+  </div>
+
+  <button @click="movePlayer(1, 0)">⬇️</button>
+</div>
+
      <div class="game-footer">
       <div class="controls">
         <strong>🎮 Controls:</strong>
@@ -102,6 +123,7 @@
 </template>
 
 <script setup>
+import { saveScore } from '../../utils/leaderboard'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { generateMaze } from '../../algorithms/mazeGenerator'
 import { findShortestPath } from '../../algorithms/bfs'
@@ -130,6 +152,7 @@ const mazeSizes = {
 const seconds = ref(0)
 const moves = ref(0)
 const difficulty = ref('Easy')
+const isDarkMode = ref(false)
 const hint = ref(null)
 
 let timer = null
@@ -142,6 +165,15 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timer)
+}
+
+function toggleTheme() {
+  isDarkMode.value = !isDarkMode.value
+
+  localStorage.setItem(
+    'maze-theme',
+    JSON.stringify(isDarkMode.value)
+  )
 }
 
 function showHint() {
@@ -203,6 +235,13 @@ player.value.row === exit.value.row &&
 player.value.col === exit.value.col
   ) {
     stopTimer()
+
+    saveScore({
+  difficulty: difficulty.value,
+  time: seconds.value,
+  moves: moves.value,
+  date: new Date().toLocaleDateString()
+})
     gameWon.value = true
   }
 }
@@ -231,6 +270,13 @@ function handleKeyDown(event) {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
+  
+  const savedTheme = localStorage.getItem('maze-theme')
+
+if (savedTheme) {
+  isDarkMode.value = JSON.parse(savedTheme)
+}
+  
   startTimer()
 })
 
@@ -245,15 +291,116 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-.new-game-btn {
-  padding: 8px 14px;
+.mobile-controls {
+  display: none;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.mobile-controls button {
+  width: 60px;
+  height: 60px;
+  margin: 6px;
+  font-size: 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   background: #2563eb;
   color: white;
   cursor: pointer;
+}
+
+.horizontal-controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: block;
+  }
+}
+
+.theme-btn {
+  height: 46px;
+  min-width: 110px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #111827;
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 15px;
   font-weight: 600;
-  transition: 0.3s;
+
+  transition: .25s;
+}
+
+.theme-btn:hover {
+  background: #1f2937;
+}
+
+.dark {
+  background: #111827;
+  color: white;
+}
+
+.dark .game-info {
+  border-color: #374151;
+}
+
+
+.dark .game-info h2 {
+  color: white !import;
+}
+
+.dark .stat-item {
+  background: #1e3a8a;
+  color: white;
+}
+
+
+.dark .maze {
+  background: #374151;
+}
+
+.dark .wall {
+  background: #000;
+}
+
+.dark .path {
+  background: #d1d5db;
+}
+
+.dark .game-footer {
+  border-color: #374151;
+}
+
+.dark .difficulty-select {
+  background: #1f2937;
+  color: white;
+  border-color: #374151;
+}
+
+.new-game-btn {
+  height: 46px;
+  min-width: 120px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: .25s;
 }
 
 .new-game-btn:hover {
@@ -261,10 +408,14 @@ onUnmounted(() => {
 }
 
 .difficulty-select {
-  padding: 8px 12px;
-  border-radius: 8px;
+  height: 46px;
+  min-width: 120px;
+
+  padding: 0 14px;
+
+  border-radius: 10px;
   border: 1px solid #d1d5db;
-  background: white;
+
   font-size: 15px;
   cursor: pointer;
 }
@@ -292,39 +443,57 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 18px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #f1f5f9;
+  gap: 30px;
+  padding-bottom: 20px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e5e7eb;
 }
 
 .game-info h2 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 38px;
+  font-weight: 700;
   color: #1e293b;
+  white-space: nowrap;
 }
-
 .stats {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 18px;
-  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #eff6ff;
   color: #2563eb;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .maze {
   display: inline-block;
-  padding: 20px;
-  background: #e2e8f0;
-  border-radius: 14px;
+
+  margin: 30px auto;
+
+  padding: 24px;
+
+  background: #cbd5e1;
+
+  border-radius: 18px;
+
   overflow: auto;
-  max-width: 100%;
+}
+
+.maze {
+  display: block;
+  width: fit-content;
+  margin: 30px auto;
 }
 
 .row {
@@ -358,8 +527,13 @@ onUnmounted(() => {
 }
 
 .controls {
-  color: #64748b;
-  font-size: 15px;
+  text-align: center;
+
+  color: #334155;
+
+  font-size: 17px;
+
+  font-weight: 500;
 }
 
 .controls strong {
@@ -426,49 +600,40 @@ onUnmounted(() => {
 }
 
 /* Responsive */
+@media (max-width:768px){
 
-@media (max-width: 768px) {
-
-  .game-container {
-    padding: 16px;
-    margin: 20px auto;
-  }
-
-  .new-game-btn {
-  width: 100%;
+.game-info{
+    flex-direction:column;
+    align-items:center;
 }
 
-.difficulty-select {
-  width: 100%;
+.game-info h2{
+    font-size:30px;
 }
 
-  .game-info {
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-  }
-
-  .game-info h2 {
-    font-size: 1.6rem;
-  }
-
-  .stats {
-     flex-direction: column;
-  gap: 8px;
-  }
-
-.stat-item {
-  font-size: 16px;
+.stats{
+    justify-content:center;
 }
 
-  .cell {
-    width: 24px;
-    height: 24px;
-    font-size: 14px;
-  }
+.new-game-btn,
+.theme-btn,
+.difficulty-select{
+    width:100%;
+}
 
-  .maze {
-    padding: 10px;
-  }
+.cell{
+    width:24px;
+    height:24px;
+    font-size:14px;
+}
+
+.maze{
+    padding:12px;
+}
+
+.controls{
+    font-size:15px;
+}
+
 }
 </style>
