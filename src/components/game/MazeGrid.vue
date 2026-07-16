@@ -1,19 +1,37 @@
 <template>
   <div class="game-container">
     <!-- Header -->
-    <div class="game-info">
-      <h2>🧩 AI Maze Escape</h2>
+  <div class="game-info">
+  <h2>🧩 AI Maze Escape</h2>
 
-     <div class="stats">
-  <div class="stat-item">
-    ⏱️ {{ seconds }}s
-  </div>
+  <div class="stats">
+    <div class="stat-item">
+      ⏱️ {{ seconds }}s
+    </div>
 
-  <div class="stat-item">
-    👣 {{ moves }}
+    <div class="stat-item">
+      👣 {{ moves }}
+    </div>
+
+    <button
+      class="new-game-btn"
+      @click="resetGame"
+    >
+      🔄 New Game
+    </button>
+
+    <select
+  v-model="difficulty"
+  @change="resetGame"
+  class="difficulty-select"
+>
+  <option>Easy</option>
+  <option>Medium</option>
+  <option>Hard</option>
+</select>
+
   </div>
 </div>
-    </div>
 
     <!-- Maze -->
     <div class="maze">
@@ -76,12 +94,12 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { generateMaze } from '../../algorithms/mazeGenerator'
 
-const maze = generateMaze()
+const maze = ref(generateMaze())
 
-const exit = {
-  row: maze.length - 2,
-  col: maze[0].length - 2
-}
+const exit = ref({
+  row: maze.value.length - 2,
+  col: maze.value[0].length - 2
+})
 
 const player = ref({
   row: 1,
@@ -90,9 +108,16 @@ const player = ref({
 
 const gameWon = ref(false)
 
+const mazeSizes = {
+  Easy: 15,
+  Medium: 21,
+  Hard: 31
+}
+
 // Timer
 const seconds = ref(0)
 const moves = ref(0)
+const difficulty = ref('Easy')
 
 let timer = null
 
@@ -106,17 +131,41 @@ function stopTimer() {
   clearInterval(timer)
 }
 
+function resetGame() {
+const size = mazeSizes[difficulty.value]
+
+maze.value = generateMaze(size, size)
+
+  exit.value = {
+    row: maze.value.length - 2,
+    col: maze.value[0].length - 2
+  }
+
+  player.value = {
+    row: 1,
+    col: 1
+  }
+
+  seconds.value = 0
+  moves.value = 0
+
+  gameWon.value = false
+
+  stopTimer()
+  startTimer()
+}
+
 function playAgain() {
-  window.location.reload()
+  resetGame()
 }
 
 function movePlayer(rowOffset, colOffset) {
   const newRow = player.value.row + rowOffset
   const newCol = player.value.col + colOffset
 
-  if (maze[newRow][newCol] === 1) {
-    return
-  }
+if (maze.value[newRow][newCol] === 1) {
+  return
+}
 
 player.value.row = newRow
 player.value.col = newCol
@@ -124,8 +173,8 @@ player.value.col = newCol
 moves.value++
 
   if (
-    player.value.row === exit.row &&
-    player.value.col === exit.col
+player.value.row === exit.value.row &&
+player.value.col === exit.value.col
   ) {
     stopTimer()
     gameWon.value = true
@@ -168,6 +217,35 @@ onUnmounted(() => {
 <style scoped>
 * {
   box-sizing: border-box;
+}
+
+.new-game-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.new-game-btn:hover {
+  background: #1d4ed8;
+}
+
+.difficulty-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.difficulty-select:focus {
+  outline: none;
+  border-color: #2563eb;
 }
 
 .game-container {
@@ -325,6 +403,14 @@ onUnmounted(() => {
     padding: 16px;
     margin: 20px auto;
   }
+
+  .new-game-btn {
+  width: 100%;
+}
+
+.difficulty-select {
+  width: 100%;
+}
 
   .game-info {
     flex-direction: column;
