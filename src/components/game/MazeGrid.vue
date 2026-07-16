@@ -20,6 +20,13 @@
       🔄 New Game
     </button>
 
+    <button
+  class="new-game-btn"
+  @click="showHint"
+>
+  💡 Hint
+</button>
+
     <select
   v-model="difficulty"
   @change="resetGame"
@@ -44,10 +51,14 @@
           v-for="(cell, colIndex) in row"
           :key="colIndex"
           class="cell"
-          :class="{
-            wall: cell === 1,
-            path: cell === 0,
-            player: player.row === rowIndex && player.col === colIndex
+         :class="{
+           wall: cell === 1,
+           path: cell === 0,
+           player: player.row === rowIndex && player.col === colIndex,
+           hint:
+             hint &&
+             hint.row === rowIndex &&
+             hint.col === colIndex
           }"
         >
           <span
@@ -93,6 +104,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { generateMaze } from '../../algorithms/mazeGenerator'
+import { findShortestPath } from '../../algorithms/bfs'
 
 const maze = ref(generateMaze())
 
@@ -118,6 +130,7 @@ const mazeSizes = {
 const seconds = ref(0)
 const moves = ref(0)
 const difficulty = ref('Easy')
+const hint = ref(null)
 
 let timer = null
 
@@ -129,6 +142,18 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timer)
+}
+
+function showHint() {
+  const path = findShortestPath(
+    maze.value,
+    player.value,
+    exit.value
+  )
+
+  if (path.length > 1) {
+    hint.value = path[1]
+  }
 }
 
 function resetGame() {
@@ -171,6 +196,7 @@ player.value.row = newRow
 player.value.col = newCol
 
 moves.value++
+hint.value = null
 
   if (
 player.value.row === exit.value.row &&
@@ -246,6 +272,10 @@ onUnmounted(() => {
 .difficulty-select:focus {
   outline: none;
   border-color: #2563eb;
+}
+
+.hint {
+  background: #fde047 !important;
 }
 
 .game-container {
