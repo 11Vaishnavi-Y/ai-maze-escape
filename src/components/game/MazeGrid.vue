@@ -9,7 +9,7 @@
 
   <div class="stats">
     <div class="stat-item">
-      ⏱️ {{ seconds }}s
+      ⏱️ {{ seconds }}
     </div>
 
     <div class="stat-item">
@@ -236,12 +236,12 @@ player.value.col === exit.value.col
   ) {
     stopTimer()
 
-    saveScore({
-  difficulty: difficulty.value,
-  time: seconds.value,
-  moves: moves.value,
-  date: new Date().toLocaleDateString()
-})
+     saveScore({
+    difficulty: difficulty.value,
+    time: seconds.value,
+    moves: moves.value,
+    date: new Date().toLocaleDateString()
+  })
     gameWon.value = true
   }
 }

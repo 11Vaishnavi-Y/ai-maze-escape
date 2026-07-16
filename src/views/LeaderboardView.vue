@@ -7,24 +7,28 @@
     </div>
 
     <table v-else>
-      <thead>
-        <tr>
-          <th>Difficulty</th>
-          <th>Time</th>
-          <th>Moves</th>
-        </tr>
-      </thead>
+     <thead>
+  <tr>
+    <th>#</th>
+    <th>Difficulty</th>
+    <th>Time</th>
+    <th>Moves</th>
+    <th>Date</th>
+  </tr>
+</thead>
 
-      <tbody>
-        <tr
-          v-for="(score, index) in scores"
-          :key="index"
-        >
-          <td>{{ score.difficulty }}</td>
-          <td>{{ score.time }}s</td>
-          <td>{{ score.moves }}</td>
-        </tr>
-      </tbody>
+     <tbody>
+  <tr
+    v-for="(score, index) in scores"
+    :key="index"
+  >
+    <td>{{ index + 1 }}</td>
+    <td>{{ score.difficulty }}</td>
+    <td>{{ score.time }}s</td>
+    <td>{{ score.moves }}</td>
+    <td>{{ score.date }}</td>
+  </tr>
+</tbody>
     </table>
   </div>
 </template>
