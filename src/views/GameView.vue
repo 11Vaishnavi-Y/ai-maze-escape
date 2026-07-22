@@ -1,8 +1,6 @@
 <template>
   <AppLayout>
 
-    <h1>🎮 AI Maze Escape</h1>
-
     <MazeGrid />
 
   </AppLayout>

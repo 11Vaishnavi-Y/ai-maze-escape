@@ -1,4 +1,5 @@
 <template>
+<Navbar/>
   <div class="settings-page">
 
     <div class="card">
@@ -62,6 +63,8 @@
 </template>
 
 <script setup>
+import Navbar from '../components/common/Navbar.vue' 
+
 function resetLeaderboard(){
 
 if(confirm("Clear all leaderboard scores?")){

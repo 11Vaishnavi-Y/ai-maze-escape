@@ -1,4 +1,5 @@
 <template>
+ <Navbar />
   <div class="leaderboard">
     <h3>🏆 Leaderboard</h3>
 
@@ -34,6 +35,7 @@
 </template>
 
 <script setup>
+import Navbar from '../components/common/Navbar.vue'
 import { ref, onMounted } from 'vue'
 import { getLeaderboard } from '../utils/leaderboard'
 
