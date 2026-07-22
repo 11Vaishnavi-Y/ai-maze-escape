@@ -419,7 +419,7 @@ onUnmounted(() => {
 
 
 .dark .game-info h2 {
-  color: white !import;
+  color: white !important;
 }
 
 .dark .stat-item {
