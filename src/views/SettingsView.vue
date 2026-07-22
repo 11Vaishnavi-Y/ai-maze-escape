@@ -64,18 +64,15 @@
 
 <script setup>
 import Navbar from '../components/common/Navbar.vue' 
+import { clearLeaderboard } from '../utils/leaderboard'
 
-function resetLeaderboard(){
-
-if(confirm("Clear all leaderboard scores?")){
-
-localStorage.removeItem("leaderboard")
-
-alert("Leaderboard cleared!")
-
+function resetLeaderboard() {
+  if (confirm("Clear all leaderboard scores?")) {
+    clearLeaderboard()
+    alert("Leaderboard cleared!")
+  }
 }
 
-}
 </script>
 
 <style scoped>

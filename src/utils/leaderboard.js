@@ -24,3 +24,7 @@ export function getLeaderboard() {
     localStorage.getItem(STORAGE_KEY) || "[]"
   );
 }
+
+export function clearLeaderboard() {
+  localStorage.removeItem(STORAGE_KEY);
+}
