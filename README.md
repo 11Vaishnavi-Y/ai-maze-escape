@@ -1,5 +1,55 @@
-# Vue 3 + Vite
+# 🧩 AI Maze Escape
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+AI Maze Escape is a responsive maze game built with Vue 3 and Vite. Navigate through randomly generated mazes, reach the exit, and challenge yourself with different difficulty levels while tracking your best scores.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## 🚀 Features
+
+- 🎮 Random maze generation
+- 😀 Player movement using keyboard and mobile controls
+- 🚪 Exit detection
+- ⏱️ Timer and move counter
+- 💡 AI Hint System (Shortest Path)
+- 🏆 Leaderboard (Local Storage)
+- 🎯 Multiple difficulty levels
+- 🌙 Dark/Light mode
+- 📱 Responsive design
+- 🏅 Achievement badges
+- ⚙️ Settings page
+
+## 🛠️ Tech Stack
+
+- Vue 3
+- Vite
+- Vue Router
+- Pinia
+- JavaScript
+- CSS3
+- Local Storage
+
+## 📂 Project Structure
+
+```text
+src/
+├── components/
+├── views/
+├── algorithms/
+├── utils/
+├── router/
+└── assets/
+```
+
+## ▶️ Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+## 🎯 Future Improvements
+
+- Confetti animation on victory
+- Sound effects
+- AI auto-solve animation
+- Online leaderboard
+- User authentication
+
